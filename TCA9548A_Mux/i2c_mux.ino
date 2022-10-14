@@ -1,4 +1,3 @@
-
 #include <avr/io.h>
 #define F_CPU 16000000UL
 
@@ -132,33 +131,31 @@ void setup() {
   _delay_ms(100);
   i2c_init();
   _delay_ms(100);
-  usart_sendByte('2');
   usart_sendByte('\n');
   i2c_mux_write(0x70, 0x00);
   i2c_mux_write(0x70, 0x01);
-  i2c_init_aht10(address);
 }
 
 /* ARDUINO MAIN LOOP */
 void loop() {
     unsigned int state;
-    uint32_t hum = 0; 
-    uint32_t temp = 0; 
-
+    
     //I2C Loop
     int i = 0;
 
     for(i = 0; i < 8; i++) {
+      
+      //! Write New Mux Channel
       i2c_mux_write(0x70, 0x01 << i);
       _delay_ms(100); 
+
+      //! Read the Current Channel
       state = (unsigned int)i2c_mux_read(0x70);
-      sprintf(str, "Mux State: %d\n", state);
-      
+      sprintf(str, "Mux State: %d\n", state);     
       //Send str to UART   
       usart_sendString(str);  
     
       _delay_ms(2000);
-       i2c_measure_aht10(address);
     }
     _delay_ms(1000);
 }
